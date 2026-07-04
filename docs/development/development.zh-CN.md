@@ -17,12 +17,13 @@ go test ./...
 go vet ./...
 make build
 make run
+make compose-build
 ```
 
 不使用 make 构建：
 
 ```bash
-go build -ldflags "-X main.version=$(git describe --tags --always --dirty 2>/dev/null || echo 0.0.4)" \
+go build -ldflags "-X main.version=$(git describe --tags --always --dirty 2>/dev/null || echo dev)" \
   -o bin/qq-agent-mail-mcp ./cmd/qq-agent-mail-mcp
 ```
 
@@ -38,7 +39,16 @@ go build -ldflags "-X main.version=$(git describe --tags --always --dirty 2>/dev
 -ldflags "-X main.version=<version>"
 ```
 
-`make build` 会优先使用最新 git tag，没有 tag 时回退到 `0.0.4`。
+`make build` 会优先使用最新 git tag，没有 tag 时回退到 `dev`。Release/GHCR 构建会通过 Docker build arg `VERSION` 注入 release tag。不要在 `main.go` 中手动维护发布版本号。
+
+直接执行 `go build ./cmd/qq-agent-mail-mcp` 或直接执行 `docker compose up -d --build` 时，如果没有注入版本，二进制版本会是 `dev`。需要可追踪版本时，使用 `make build`、`make compose-build` 或 GHCR release workflow。
+
+手动使用源码构建 compose 部署时，可以这样注入版本：
+
+```bash
+QQ_AGENT_MAIL_MCP_BUILD_VERSION="$(git describe --tags --always --dirty 2>/dev/null || echo dev)" \
+  docker compose up -d --build
+```
 
 ## Docker 镜像
 

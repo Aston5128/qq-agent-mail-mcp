@@ -45,24 +45,35 @@ Agent runtime
 
 ## Quick deployment with Docker Compose
 
+There are two compose files:
+
+```text
+docker-compose.ghcr.yml   # recommended: pull the published GHCR image
+docker-compose.yml        # source build: build the image locally
+```
+
+### Recommended: pull the GitHub Package image
+
 Clone the latest code:
 
 ```bash
 git clone https://github.com/Aston5128/qq-agent-mail-mcp.git
+cd qq-agent-mail-mcp
 ```
 
-Build and start the server:
+Pull and start the published image:
 
 ```bash
-docker compose up -d --build
+docker compose -f docker-compose.ghcr.yml pull
+docker compose -f docker-compose.ghcr.yml up -d
 ```
 
 Authorize `agently-cli` inside the running container:
 
 ```bash
 # This command prints a URL. Open it in any browser and authorize with WeChat.
-docker compose exec qq-agent-mail-mcp agently-cli auth login
-docker compose exec qq-agent-mail-mcp agently-cli +me
+docker compose -f docker-compose.ghcr.yml exec qq-agent-mail-mcp agently-cli auth login
+docker compose -f docker-compose.ghcr.yml exec qq-agent-mail-mcp agently-cli +me
 ```
 
 The default StreamableHTTP endpoint is:
@@ -73,6 +84,29 @@ http://<host>:8765
 
 The compose file persists both `agently-cli` config and OAuth keychain data, so
 authorization survives `docker compose down` / `up`.
+
+To pin a specific image tag, create `.env` next to the compose file:
+
+```env
+QQ_AGENT_MAIL_MCP_VERSION=v0.0.5
+```
+
+Then run the same GHCR compose commands.
+
+### Alternative: build from source
+
+If you want the deployment host to build from the checked-out source tree:
+
+```bash
+make compose-build
+```
+
+Both compose files use the same ports, volumes, environment variables, and
+container name. The only difference is whether the image is pulled from GHCR or
+built locally from `Dockerfile`.
+
+Plain `docker compose up -d --build` still works, but the local image tag and
+binary version default to `dev` unless `QQ_AGENT_MAIL_MCP_BUILD_VERSION` is set.
 
 ## MCP client configuration
 

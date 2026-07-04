@@ -2,6 +2,13 @@
 
 > 中文版：[CHANGELOG.zh-CN.md](docs/changelogs/CHANGELOG.zh-CN.md)
 
+## 0.0.5
+
+- Publish a GitHub Container Registry image: a `publish-ghcr.yml` workflow builds and pushes `ghcr.io/aston5128/qq-agent-mail-mcp` on release, tagged with the release tag and `latest`.
+- Add `docker-compose.ghcr.yml` to deploy from the published image instead of building locally. Pin a tag with `QQ_AGENT_MAIL_MCP_VERSION` (e.g. `v0.0.5`) in a `.env`.
+- Stop hardcoding the release version in source. The binary version is injected from the git/release tag via ldflags and falls back to `dev` for local builds; `docker-compose.yml` reads `QQ_AGENT_MAIL_MCP_BUILD_VERSION` (defaults to `dev`), and `make compose-build` injects `git describe`.
+- Document both deployment paths (GHCR pull vs. source build) and the new version-injection flow across the README, deployment, and development docs (en + zh-CN).
+
 ## 0.0.4
 
 - Fix credential loss across container restarts: `agently-cli` stores its OAuth token in a file-backed keychain at `$HOME/.local/share/agently-cli/` (`master.key` + `bootstrap_token.enc`), not in `AGENTLY_CLI_CONFIG_DIR` (which holds only `config.json`). Add a second named volume (`agently-keyring`) at that path so the token survives `docker compose down` / `up`. Verified on a real host.

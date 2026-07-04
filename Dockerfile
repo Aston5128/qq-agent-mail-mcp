@@ -12,8 +12,9 @@ RUN --mount=type=cache,target=/go/pkg/mod \
 
 COPY . .
 
-# version is injected via ldflags (same as Makefile); override with --build-arg.
-ARG VERSION=0.0.3
+# Version is injected via ldflags. Release/GHCR builds pass the release tag.
+# Local builds may leave it as "dev"; do not hard-code release versions here.
+ARG VERSION=dev
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
     CGO_ENABLED=0 go build -trimpath \

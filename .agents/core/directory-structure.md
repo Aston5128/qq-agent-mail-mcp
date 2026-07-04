@@ -57,12 +57,16 @@ qq-agent-mail-mcp/
 │   └── server/                 # MCP Server 实现
 │       ├── server.go           # Server 核心逻辑 + StreamableHTTP
 │       └── streamable_http_test.go  # StreamableHTTP 测试
+├── .github/                    # GitHub 配置（CI/CD）
+│   └── workflows/
+│       └── publish-ghcr.yml    # Release 时构建并推送 GHCR 镜像
 ├── .dockerignore               # Docker 构建忽略规则
 ├── .env.example                # 环境变量配置示例
 ├── .gitignore                  # Git 忽略规则
 ├── Dockerfile                  # 多阶段镜像构建（MCP server + agently-cli）
-├── Makefile                    # build/run/test/vet/clean 目标
-├── docker-compose.yml          # 容器编排（凭证卷 + 端口 + env）
+├── Makefile                    # build/run/compose-build/test/vet/clean 目标
+├── docker-compose.yml          # 容器编排：源码构建（凭证卷 + 端口 + env）
+├── docker-compose.ghcr.yml     # 容器编排：拉取 GHCR 已发布镜像
 ├── go.mod                      # Go 模块定义
 ├── go.sum                      # Go 依赖校验
 ├── README.md                   # 英文 README（canonical）
@@ -129,14 +133,16 @@ MCP Server 的核心实现。
 ### 根目录文件
 
 - `go.mod` / `go.sum`：Go 模块依赖管理
-- `Makefile`：`build` / `run` / `test` / `vet` / `clean` 目标，`build` 通过 ldflags 注入版本号
+- `Makefile`：`build` / `run` / `compose-build` / `test` / `vet` / `clean` 目标；版本号通过 ldflags 从 git tag 注入，无 tag 时回退 `dev`
 - `README.md`：英文 README（canonical，其他语言见 `docs/readme/`）
 - `CHANGELOG.md`：英文 changelog（canonical，其他语言见 `docs/changelogs/`）
 - `.gitignore`：Git 忽略规则，包括 `bin/`、`.env`、本地配置等
 - `.env.example`：环境变量配置示例（`.env` 已 gitignore）
 - `Dockerfile`：多阶段镜像构建 —— Go 编译 MCP server，运行时层预装 `agently-cli`
-- `docker-compose.yml`：容器编排 —— `AGENTLY_CLI_CONFIG_DIR` 凭证卷、端口映射、可选 `.env`
+- `docker-compose.yml`：容器编排（源码构建）—— `AGENTLY_CLI_CONFIG_DIR` 凭证卷、端口映射、可选 `.env`，镜像 tag 由 `QQ_AGENT_MAIL_MCP_BUILD_VERSION` 控制（默认 `dev`）
+- `docker-compose.ghcr.yml`：容器编排（GHCR 拉取）—— 拉取 `ghcr.io/aston5128/qq-agent-mail-mcp`，镜像 tag 由 `QQ_AGENT_MAIL_MCP_VERSION` 控制（默认 `latest`）
 - `.dockerignore`：Docker 构建上下文忽略规则
+- `.github/workflows/publish-ghcr.yml`：Release 时构建并推送 GHCR 镜像（tag 为 release tag + `latest`）
 
 ## 设计原则
 

@@ -17,12 +17,13 @@ go test ./...
 go vet ./...
 make build
 make run
+make compose-build
 ```
 
 Build without make:
 
 ```bash
-go build -ldflags "-X main.version=$(git describe --tags --always --dirty 2>/dev/null || echo 0.0.4)" \
+go build -ldflags "-X main.version=$(git describe --tags --always --dirty 2>/dev/null || echo dev)" \
   -o bin/qq-agent-mail-mcp ./cmd/qq-agent-mail-mcp
 ```
 
@@ -39,7 +40,21 @@ The binary version is injected through:
 -ldflags "-X main.version=<version>"
 ```
 
-`make build` uses the latest git tag when available and falls back to `0.0.4`.
+`make build` uses the latest git tag when available and falls back to `dev`.
+Release/GHCR builds inject the release tag through the Docker build argument
+`VERSION`. Do not manually maintain a release version in `main.go`.
+
+Plain `go build ./cmd/qq-agent-mail-mcp` and plain `docker compose up -d --build`
+produce a `dev` binary unless you inject a version. Use `make build`,
+`make compose-build`, or the GHCR release workflow when you need traceable
+versions.
+
+For manual source-build compose deployments:
+
+```bash
+QQ_AGENT_MAIL_MCP_BUILD_VERSION="$(git describe --tags --always --dirty 2>/dev/null || echo dev)" \
+  docker compose up -d --build
+```
 
 ## Docker image
 

@@ -10,9 +10,12 @@ import (
 	"github.com/Aston5128/qq-agent-mail-mcp/internal/server"
 )
 
-// version 可在构建时通过 ldflags 注入；未注入时使用当前源码版本。
-// 构建示例: go build -ldflags "-X main.version=0.0.4"
-var version = "0.0.4"
+// version 是 MCP server 自报的二进制版本。
+//
+// 不要在源码里手动维护发布版本号；GitHub Release / GHCR 构建会通过
+// -ldflags "-X main.version=<release-tag>" 注入真实版本。
+// 本地 go run 或未注入版本的构建使用 "dev"，表示这是开发构建。
+var version = "dev"
 
 const name = "qq-agent-mail-mcp"
 

@@ -2,14 +2,47 @@
 
 [English](deployment.md)
 
-当前推荐使用 Docker Compose 部署，因为当前没有认证，推荐部署在 hermes 同宿主机中。
+当前推荐使用 Docker Compose 部署。优先路径是使用 `docker-compose.ghcr.yml` 拉取已发布的 GitHub Container Registry 镜像；如果希望部署机直接从源码构建，则使用默认 `docker-compose.yml`。
+
+因为当前没有内置认证，推荐部署在 Hermes 同宿主机或其它可信私有环境中。
 镜像会把 Go MCP server 和 `agently-cli` 打包到同一个轻量运行时容器里。
 
-## 启动
+## 使用已发布镜像启动
 
 ```bash
-docker compose up -d --build
+docker compose -f docker-compose.ghcr.yml pull
+docker compose -f docker-compose.ghcr.yml up -d
 ```
+
+然后授权 CLI：
+
+```bash
+docker compose -f docker-compose.ghcr.yml exec qq-agent-mail-mcp agently-cli auth login
+docker compose -f docker-compose.ghcr.yml exec qq-agent-mail-mcp agently-cli +me
+```
+
+如果要固定某个镜像 tag，设置：
+
+```env
+QQ_AGENT_MAIL_MCP_VERSION=v0.0.5
+```
+
+## 从源码构建
+
+如果希望本地镜像 tag 和二进制版本可追踪，使用：
+
+```bash
+make compose-build
+```
+
+或者手动注入版本：
+
+```bash
+QQ_AGENT_MAIL_MCP_BUILD_VERSION="$(git describe --tags --always --dirty 2>/dev/null || echo dev)" \
+  docker compose up -d --build
+```
+
+如果直接运行 `docker compose up -d --build`，本地镜像 tag 和二进制版本默认是 `dev`。
 
 然后授权 CLI：
 
@@ -82,6 +115,16 @@ Docker 内部会把 `QQ_AGENT_MAIL_MCP_BIND` 设置为 `0.0.0.0:8765`。
 如果另一个 Agent 已经安装在 `/opt/<agent-name>` 下，这个服务应作为兄弟目录存在，而不是放进那个 Agent 应用目录里面。
 
 ## 升级
+
+使用已发布镜像：
+
+```bash
+docker compose -f docker-compose.ghcr.yml pull
+docker compose -f docker-compose.ghcr.yml up -d
+docker compose -f docker-compose.ghcr.yml exec qq-agent-mail-mcp agently-cli +me
+```
+
+使用本地源码构建：
 
 ```bash
 docker compose build --pull

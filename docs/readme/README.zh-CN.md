@@ -40,24 +40,35 @@ Agent runtime
 
 ## Docker Compose 快速部署
 
+这里有两个 compose 文件：
+
+```text
+docker-compose.ghcr.yml   # 推荐：拉取已发布的 GHCR 镜像
+docker-compose.yml        # 源码构建：在本机从源码构建镜像
+```
+
+### 推荐：拉取 GitHub Package 镜像
+
 拉取最新的代码
 
 ```bash
 git clone https://github.com/Aston5128/qq-agent-mail-mcp.git
+cd qq-agent-mail-mcp
 ```
 
-构建并启动 server：
+拉取并启动已发布镜像：
 
 ```bash
-docker compose up -d --build
+docker compose -f docker-compose.ghcr.yml pull
+docker compose -f docker-compose.ghcr.yml up -d
 ```
 
 在运行中的容器内授权 `agently-cli`：
 
 ```bash
 # 运行这行之后会输出一个 url，复制到任意浏览器中使用微信进行授权
-docker compose exec qq-agent-mail-mcp agently-cli auth login
-docker compose exec qq-agent-mail-mcp agently-cli +me
+docker compose -f docker-compose.ghcr.yml exec qq-agent-mail-mcp agently-cli auth login
+docker compose -f docker-compose.ghcr.yml exec qq-agent-mail-mcp agently-cli +me
 ```
 
 默认 StreamableHTTP endpoint：
@@ -67,6 +78,26 @@ http://<host>:8765
 ```
 
 compose 文件会持久化 `agently-cli` 的 config 和 OAuth keychain 数据，因此授权状态可以在 `docker compose down` / `up` 后保留。
+
+如果要固定某个镜像 tag，可以在 compose 文件旁边创建 `.env`：
+
+```env
+QQ_AGENT_MAIL_MCP_VERSION=v0.0.5
+```
+
+然后继续使用上面的 GHCR compose 命令。
+
+### 可选：源码构建
+
+如果希望部署机直接从当前源码树构建镜像：
+
+```bash
+make compose-build
+```
+
+两个 compose 文件使用相同的端口、volume、环境变量和容器名；区别只在于镜像是从 GHCR 拉取，还是从 `Dockerfile` 本地构建。
+
+直接运行 `docker compose up -d --build` 仍然可用，但如果没有设置 `QQ_AGENT_MAIL_MCP_BUILD_VERSION`，本地镜像 tag 和二进制版本都会是 `dev`。
 
 ## MCP client 配置
 

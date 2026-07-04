@@ -2,6 +2,13 @@
 
 > English: [CHANGELOG.md](../../CHANGELOG.md)
 
+## 0.0.5
+
+- 发布 GitHub Container Registry 镜像：新增 `publish-ghcr.yml` 工作流，在 release 时构建并推送 `ghcr.io/aston5128/qq-agent-mail-mcp`，打上 release tag 与 `latest`。
+- 新增 `docker-compose.ghcr.yml`，使用已发布镜像部署而非本地构建。在 `.env` 中用 `QQ_AGENT_MAIL_MCP_VERSION`（如 `v0.0.5`）固定 tag。
+- 不再在源码中硬编码发布版本。二进制版本通过 ldflags 从 git/release tag 注入，本地构建回退为 `dev`；`docker-compose.yml` 读取 `QQ_AGENT_MAIL_MCP_BUILD_VERSION`（默认 `dev`），`make compose-build` 会注入 `git describe` 结果。
+- README、部署与开发文档（en + zh-CN）补充两条部署路径（GHCR 拉取 vs 源码构建）与新版本注入流程说明。
+
 ## 0.0.4
 
 - 修复容器重启导致凭证丢失：`agently-cli` 把 OAuth token 存在文件型 keychain（`$HOME/.local/share/agently-cli/` 下的 `master.key` + `bootstrap_token.enc`），而非 `AGENTLY_CLI_CONFIG_DIR`（后者只放 `config.json`）。在该路径新增第二个命名卷 `agently-keyring`，使 token 能在 `docker compose down` / `up` 后保留。已在真实宿主机验证。

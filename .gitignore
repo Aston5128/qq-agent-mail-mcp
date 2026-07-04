@@ -39,3 +39,6 @@ bin/
 
 # macOS
 .DS_Store
+
+# Local release-note drafts (copied to GitHub manually)
+RELEASE_NOTES*.md
