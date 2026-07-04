@@ -4,9 +4,9 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        VERSION: "0.0.3"
+        VERSION: "0.0.4"
         AGENTLY_CLI_VERSION: "1.0.6"
-    image: qq-agent-mail-mcp:0.0.3
+    image: qq-agent-mail-mcp:0.0.4
     container_name: qq-agent-mail-mcp
     restart: unless-stopped
 

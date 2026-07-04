@@ -11,8 +11,8 @@ import (
 )
 
 // version 可在构建时通过 ldflags 注入；未注入时使用当前源码版本。
-// 构建示例: go build -ldflags "-X main.version=0.0.3"
-var version = "0.0.3"
+// 构建示例: go build -ldflags "-X main.version=0.0.4"
+var version = "0.0.4"
 
 const name = "qq-agent-mail-mcp"
 

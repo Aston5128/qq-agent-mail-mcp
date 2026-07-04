@@ -2,9 +2,10 @@
 
 > 中文版：[CHANGELOG.zh-CN.md](docs/changelogs/CHANGELOG.zh-CN.md)
 
-## Unreleased
+## 0.0.4
 
 - Fix credential loss across container restarts: `agently-cli` stores its OAuth token in a file-backed keychain at `$HOME/.local/share/agently-cli/` (`master.key` + `bootstrap_token.enc`), not in `AGENTLY_CLI_CONFIG_DIR` (which holds only `config.json`). Add a second named volume (`agently-keyring`) at that path so the token survives `docker compose down` / `up`. Verified on a real host.
+- Reorganize documentation: trim the README to a quick-start overview and split the detailed sections (deployment, authentication/credential persistence, tools, error responses, security, design notes, development) into standalone topic docs under `docs/`, each with an English and a `zh-CN` version. Remove the old monolithic `docs/design.md`.
 
 ## 0.0.3
 

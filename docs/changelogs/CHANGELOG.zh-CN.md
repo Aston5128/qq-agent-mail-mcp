@@ -2,9 +2,10 @@
 
 > English: [CHANGELOG.md](../../CHANGELOG.md)
 
-## 未发布
+## 0.0.4
 
 - 修复容器重启导致凭证丢失：`agently-cli` 把 OAuth token 存在文件型 keychain（`$HOME/.local/share/agently-cli/` 下的 `master.key` + `bootstrap_token.enc`），而非 `AGENTLY_CLI_CONFIG_DIR`（后者只放 `config.json`）。在该路径新增第二个命名卷 `agently-keyring`，使 token 能在 `docker compose down` / `up` 后保留。已在真实宿主机验证。
+- 文档重组：精简 README 为快速上手概览，把详细章节（部署、鉴权与凭证持久化、工具、错误响应、安全、设计说明、开发）拆分到 `docs/` 下独立的主题文档，每篇同时提供英文与 `zh-CN` 版本；移除旧的整页 `docs/design.md`。
 
 ## 0.0.3
 

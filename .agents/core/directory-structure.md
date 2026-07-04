@@ -16,15 +16,35 @@ qq-agent-mail-mcp/
 │       ├── main.go             # 程序入口
 │       └── main_test.go        # 入口测试
 ├── docs/                       # 项目文档
-│   ├── design.md               # 设计文档
+│   ├── authentication/         # 鉴权与凭证持久化
+│   │   ├── authentication.md
+│   │   └── authentication.zh-CN.md
 │   ├── changelogs/             # 非英文 changelog
 │   │   └── CHANGELOG.zh-CN.md  # 中文 changelog
+│   ├── deployment/             # 部署说明
+│   │   ├── deployment.md
+│   │   └── deployment.zh-CN.md
+│   ├── design/                 # 设计说明
+│   │   ├── design.md
+│   │   └── design.zh-CN.md
+│   ├── development/            # 开发说明
+│   │   ├── development.md
+│   │   └── development.zh-CN.md
+│   ├── errors/                 # 错误响应说明
+│   │   ├── errors.md
+│   │   └── errors.zh-CN.md
 │   ├── readme/                 # 非英文 README
 │   │   └── README.zh-CN.md     # 中文 README
-│   └── superpowers/            # 高级功能规划
-│       └── plans/
-│           ├── 2026-07-03-streamable-http-poc.md
-│           └── 2026-07-04-structured-cli-errors-0.0.2.md
+│   ├── security/               # 安全说明
+│   │   ├── security.md
+│   │   └── security.zh-CN.md
+│   ├── superpowers/            # 高级功能规划
+│   │   └── plans/
+│   │       ├── 2026-07-03-streamable-http-poc.md
+│   │       └── 2026-07-04-structured-cli-errors-0.0.2.md
+│   └── tools/                  # MCP 工具说明
+│       ├── tools.md
+│       └── tools.zh-CN.md
 ├── internal/                   # 内部实现（不对外暴露）
 │   ├── agently/                # agently-cli 封装层
 │   │   ├── runner.go           # CLI 命令执行器
@@ -68,12 +88,18 @@ qq-agent-mail-mcp/
 
 ### `docs/`
 
-项目文档目录。
+项目文档目录。每个主题目录同时提供英文版与 `zh-CN` 版本。
 
-- `design.md`：通用设计文档，描述 MCP 桥接层的设计原则和工具映射
-- `readme/`：非英文 README（如 `README.zh-CN.md`）
+- `authentication/`：鉴权与凭证持久化说明
 - `changelogs/`：非英文 changelog（如 `CHANGELOG.zh-CN.md`）
+- `deployment/`：部署说明
+- `design/`：设计说明（MCP 桥接层的设计原则与工具映射）
+- `development/`：开发说明
+- `errors/`：错误响应说明
+- `readme/`：非英文 README（如 `README.zh-CN.md`）
+- `security/`：安全说明
 - `superpowers/plans/`：高级功能规划和 PoC 方案
+- `tools/`：MCP 工具说明
 
 ### `internal/`
 
