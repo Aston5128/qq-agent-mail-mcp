@@ -376,8 +376,8 @@ Keep the development machine clean. Docker-based or Linux-container credential
 persistence tests should run on the target server or another disposable Linux
 environment, not on the local development machine.
 
-The first implementation should include a deployment-host smoke test for
-`agently-cli` credential persistence before relying on sidecar deployment.
+Credential persistence on a real deployment host has been verified (see
+[Authentication model](#authentication-model)).
 
 ## Repository hygiene
 
