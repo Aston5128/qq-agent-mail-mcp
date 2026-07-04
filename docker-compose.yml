@@ -1,0 +1,36 @@
+services:
+  qq-agent-mail-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VERSION: "0.0.3"
+        AGENTLY_CLI_VERSION: "1.0.6"
+    image: qq-agent-mail-mcp:0.0.3
+    container_name: qq-agent-mail-mcp
+    restart: unless-stopped
+
+    # Optional: pull config/secrets from a local .env. Compose injects these as
+    # real env vars, which the app treats as highest priority. Missing file is OK
+    # (required: false), so this works without a .env present.
+    env_file:
+      - path: .env
+        required: false
+
+    environment:
+      # Bind inside the container; published via `ports` below.
+      QQ_AGENT_MAIL_MCP_BIND: 0.0.0.0:8765
+      # agently-cli credential/config dir -> persisted volume below.
+      AGENTLY_CLI_CONFIG_DIR: /var/lib/agently
+      AGENTLY_CLI_NO_UPDATE_NOTIFIER: "1"
+
+    ports:
+      # Reachable on the host + LAN. To lock to host-only (agent on same host),
+      # use "127.0.0.1:8765:8765" instead.
+      - "8765:8765"
+
+    volumes:
+      - agently-data:/var/lib/agently
+
+volumes:
+  agently-data:

@@ -1,0 +1,41 @@
+# Local/private project notes
+private/
+notes/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.token
+*.secret
+
+# OAuth/auth/cache data
+.auth/
+.cache/
+.agently/
+agently-auth/
+keyring/
+
+# Runtime artifacts
+downloads/
+attachments/
+tmp/
+*.log
+
+# Node / TypeScript artifacts
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# Go artifacts
+bin/
+/qq-agent-mail-mcp
+*.test
+*.out
+
+# macOS
+.DS_Store

@@ -1,0 +1,25 @@
+# build artifacts
+bin/
+*.test
+*.out
+
+# secrets / local config — never bake into the image
+.env
+.env.*
+!.env.example
+
+# vcs
+.git/
+.gitignore
+
+# docs / meta not needed at build time
+README*.md
+CHANGELOG.md
+docs/
+.agents/
+Makefile
+
+# docker self
+Dockerfile
+docker-compose*.yml
+.dockerignore
