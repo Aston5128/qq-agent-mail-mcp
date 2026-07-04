@@ -40,9 +40,14 @@ RUN useradd --create-home --shell /usr/sbin/nologin app
 
 COPY --from=builder /out/qq-agent-mail-mcp /usr/local/bin/qq-agent-mail-mcp
 
-# agently-cli credential/config dir. A named volume mounted here inherits this
-# ownership, so login survives container restarts.
-RUN install -d -o app -g app /var/lib/agently
+# agently-cli persists two things at runtime; BOTH must survive container restarts:
+#   /var/lib/agently                          -> config.json  (AGENTLY_CLI_CONFIG_DIR)
+#   /home/app/.local/share/agently-cli        -> master.key + bootstrap_token.enc
+#                                               (file-backed keychain: the real OAuth token
+#                                                lives HERE, not in config.json)
+# Pre-create both dirs with app ownership so named volumes inherit it on first mount.
+RUN install -d -o app -g app /var/lib/agently \
+ && install -d -o app -g app /home/app/.local/share/agently-cli
 
 ENV QQ_AGENT_MAIL_MCP_BIND=0.0.0.0:8765 \
     AGENTLY_CLI_CONFIG_DIR=/var/lib/agently \
@@ -52,7 +57,7 @@ ENV QQ_AGENT_MAIL_MCP_BIND=0.0.0.0:8765 \
 USER app
 WORKDIR /home/app
 
-VOLUME ["/var/lib/agently"]
+VOLUME ["/var/lib/agently", "/home/app/.local/share/agently-cli"]
 EXPOSE 8765
 
 # tini reaps the agently-cli child processes the server exec's and forwards signals.

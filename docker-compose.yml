@@ -29,8 +29,13 @@ services:
       # use "127.0.0.1:8765:8765" instead.
       - "8765:8765"
 
+    # Two persistence targets (see Dockerfile for why both are required):
+    #   /var/lib/agently                         -> config.json
+    #   /home/app/.local/share/agently-cli       -> OAuth token (master.key + bootstrap_token.enc)
     volumes:
       - agently-data:/var/lib/agently
+      - agently-keyring:/home/app/.local/share/agently-cli
 
 volumes:
   agently-data:
+  agently-keyring:
