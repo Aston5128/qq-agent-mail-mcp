@@ -19,15 +19,16 @@ Implemented:
 - structured 1:1 MCP tool pass-through to `agently-cli`;
 - CLI stdout JSON returned as MCP structured content;
 - nonzero `agently-cli` exits return stdout JSON as structured tool errors;
-- local fake `agently-cli` integration test.
+- local fake `agently-cli` integration test;
+- container deployment (`Dockerfile` + `docker-compose.yml`) with `agently-cli`
+  OAuth credential persistence verified on a real host (token survives
+  `docker compose down` / `up`).
 
 Not implemented yet:
 
 - MCP bearer token authentication;
 - `agently-cli` OAuth management commands;
-- stdio transport;
-- production deployment files;
-- real deployment-host smoke test with QQ Agent Mail authorization.
+- stdio transport.
 
 ## Why this project exists
 
@@ -216,26 +217,29 @@ On startup, the server should call `agently-cli +me` and verify that the CLI is
 authorized. If `QQ_AGENT_MAIL_EXPECTED_ACCOUNT` is configured, the server should
 also verify that the authorized account matches it and fail fast if it does not.
 
-Before implementing the server, validate credential persistence in the intended
-runtime:
+Credential persistence was validated on a real Linux host with the included
+`docker-compose.yml`.
+
+`agently-cli` stores its real OAuth token in a **file-backed keychain**, not in
+the system keychain (the slim runtime image has none) and not in
+`AGENTLY_CLI_CONFIG_DIR` (that holds only `config.json`). The token lives in:
+
+```text
+$HOME/.local/share/agently-cli/master.key          # encryption key
+$HOME/.local/share/agently-cli/bootstrap_token.enc # encrypted OAuth token
+```
+
+Persistence therefore requires mounting **that directory** as a volume. The
+compose file mounts `agently-keyring` at `/home/app/.local/share/agently-cli`;
+with it, `agently-cli +me` still succeeds after `docker compose down` / `up`.
+
+To re-validate persistence after any deployment change:
 
 ```bash
-npm install -g @tencent-qqmail/agently-cli
 agently-cli auth login
-agently-cli +me
-agently-cli message +list --limit 3
+docker compose down && docker compose up -d
+agently-cli +me            # still authorized without re-login => persisted
 ```
-
-Then restart the container or service with the intended persistent volume and
-run:
-
-```bash
-agently-cli +me
-```
-
-If credentials survive restart, the MCP server can run as a container sidecar.
-If they do not, the deployment needs Linux keyring support or a system-layer
-runtime outside the disposable agent container.
 
 ## MCP access control
 
