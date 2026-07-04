@@ -16,15 +16,14 @@ QQ Agent Mail MCP 是一个轻量级 MCP Server，用来通过腾讯 QQ 邮箱�
 - 结构化 MCP tools 到 `agently-cli` 的 1:1 透传；
 - CLI stdout JSON 解析为 MCP structured content；
 - `agently-cli` 非零退出时，stdout 中的 JSON 错误会作为结构化 tool error 返回；
-- 本地 fake `agently-cli` 集成测试。
+- 本地 fake `agently-cli` 集成测试；
+- 容器化部署（`Dockerfile` + `docker-compose.yml`），且 `agently-cli` 的 OAuth 凭证持久化已在真实宿主机验证（token 能在 `docker compose down` / `up` 后保留）。
 
 暂未实现：
 
 - MCP bearer token 认证；
 - `agently-cli` OAuth 管理命令；
-- stdio transport；
-- 生产部署文件；
-- 真实部署宿主机上的 QQ Agent 邮箱授权烟测。
+- stdio transport。
 
 ## 为什么需要这个项目
 
@@ -195,22 +194,24 @@ qq-agent-mail-mcp auth refresh
 
 Server 启动时应该调用 `agently-cli +me`，确认 CLI 已授权。如果配置了 `QQ_AGENT_MAIL_EXPECTED_ACCOUNT`，还应该校验当前授权账号是否匹配；如果不匹配，应直接启动失败。
 
-实现 Server 前，需要先在目标运行时验证凭据持久化：
+凭据持久化已使用项目自带的 `docker-compose.yml` 在真实 Linux 宿主机上验证通过。
+
+`agently-cli` 把真正的 OAuth token 存在**文件型 keychain**里，既不在系统 keychain（精简运行时镜像里没有），也不在 `AGENTLY_CLI_CONFIG_DIR`（后者只放 `config.json`）。token 实际落在：
+
+```text
+$HOME/.local/share/agently-cli/master.key          # 加密密钥
+$HOME/.local/share/agently-cli/bootstrap_token.enc # 加密后的 OAuth token
+```
+
+因此持久化的关键是把**这个目录**挂成 volume。compose 文件把 `agently-keyring` 挂到 `/home/app/.local/share/agently-cli`；这样挂载后，`docker compose down` / `up` 之后再跑 `agently-cli +me` 仍然成功。
+
+部署有任何改动后，重新验证持久化：
 
 ```bash
-npm install -g @tencent-qqmail/agently-cli
 agently-cli auth login
-agently-cli +me
-agently-cli message +list --limit 3
+docker compose down && docker compose up -d
+agently-cli +me            # 不重新登录仍授权成功 => 已持久化
 ```
-
-然后在挂载预期持久化 volume 的情况下重启容器或服务，再运行：
-
-```bash
-agently-cli +me
-```
-
-如果凭据能在重启后保留，MCP Server 可以作为容器 sidecar 运行。如果不能保留，就需要为镜像补 Linux keyring 支持，或者把 Server 跑在一次性 Agent 容器之外的系统层。
 
 ## MCP 访问控制
 

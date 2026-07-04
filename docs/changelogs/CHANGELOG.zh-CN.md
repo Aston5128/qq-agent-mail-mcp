@@ -2,10 +2,14 @@
 
 > English: [CHANGELOG.md](../../CHANGELOG.md)
 
+## 未发布
+
+- 修复容器重启导致凭证丢失：`agently-cli` 把 OAuth token 存在文件型 keychain（`$HOME/.local/share/agently-cli/` 下的 `master.key` + `bootstrap_token.enc`），而非 `AGENTLY_CLI_CONFIG_DIR`（后者只放 `config.json`）。在该路径新增第二个命名卷 `agently-keyring`，使 token 能在 `docker compose down` / `up` 后保留。已在真实宿主机验证。
+
 ## 0.0.3
 
 - 新增容器化部署：多阶段 Dockerfile（MCP server 构建 + agently-cli 运行时）与 docker-compose。
-- 通过 `AGENTLY_CLI_CONFIG_DIR` 命名卷持久化 agently-cli 凭证，容器重启后保持登录。
+- 把 `AGENTLY_CLI_CONFIG_DIR` 挂为命名卷，用于 `config.json`。
 - 以非 root 用户运行，`tini` 作为 PID 1，保证信号正确转发与子进程回收。
 - 将 agently-cli 锁定到已验证的 1.0.6 版本（可通过 build arg 覆盖）。
 - 新增 `.dockerignore`。
