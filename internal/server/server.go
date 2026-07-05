@@ -41,6 +41,7 @@ func New(cfg Config) *mcp.Server {
 	addForwardTool[agently.MessageSendInput](s, cfg.Runner, "agently_message_send", "Send a new email using agently-cli confirmation flow.")
 	addForwardTool[agently.MessageReplyInput](s, cfg.Runner, "agently_message_reply", "Reply to an existing message using agently-cli confirmation flow.")
 	addForwardTool[agently.MessageForwardInput](s, cfg.Runner, "agently_message_forward", "Forward a message using agently-cli confirmation flow.")
+	addForwardTool[agently.MessageTrashInput](s, cfg.Runner, "agently_message_trash", "Move a message to trash using agently-cli confirmation flow.")
 	addForwardTool[agently.AttachmentUploadInput](s, cfg.Runner, "agently_attachment_upload", "Upload a file for later attachment.")
 	addForwardTool[agently.AttachmentDownloadInput](s, cfg.Runner, "agently_attachment_download", "Download a message attachment.")
 	return s

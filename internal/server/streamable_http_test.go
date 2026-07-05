@@ -2,8 +2,6 @@ package server
 
 import (
 	"context"
-	"net/http"
-	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -15,7 +13,7 @@ import (
 	"github.com/Aston5128/qq-agent-mail-mcp/internal/agently"
 )
 
-func TestStreamableHTTPToolCallForwardsToAgentlyCLI(t *testing.T) {
+func TestMCPToolCallForwardsToAgentlyCLI(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		t.Skip("shell script fake is unix-only")
 	}
@@ -24,29 +22,7 @@ func TestStreamableHTTPToolCallForwardsToAgentlyCLI(t *testing.T) {
 	fakeCLI := filepath.Join(dir, "agently-cli")
 	writeFakeAgentlyCLI(t, fakeCLI, `{"ok":true,"data":{"message":"pong"}}`)
 
-	mcpServer := New(Config{Runner: agently.Runner{Binary: fakeCLI}})
-	handler := mcp.NewStreamableHTTPHandler(
-		func(*http.Request) *mcp.Server { return mcpServer },
-		&mcp.StreamableHTTPOptions{JSONResponse: true},
-	)
-	httpServer := httptest.NewServer(handler)
-	t.Cleanup(httpServer.Close)
-
-	client := mcp.NewClient(&mcp.Implementation{Name: "test-client", Version: "0.0.0"}, nil)
-	session, err := client.Connect(
-		context.Background(),
-		&mcp.StreamableClientTransport{Endpoint: httpServer.URL, DisableStandaloneSSE: true},
-		nil,
-	)
-	if err != nil {
-		t.Fatalf("Connect returned error: %v", err)
-	}
-	t.Cleanup(func() {
-		if err := session.Close(); err != nil {
-			t.Fatalf("session.Close returned error: %v", err)
-		}
-	})
-
+	session := newInMemorySession(t, fakeCLI)
 	result, err := session.CallTool(context.Background(), &mcp.CallToolParams{Name: "agently_me"})
 	if err != nil {
 		t.Fatalf("CallTool returned error: %v", err)
@@ -64,7 +40,7 @@ func TestStreamableHTTPToolCallForwardsToAgentlyCLI(t *testing.T) {
 	}
 }
 
-func TestStreamableHTTPToolCallReturnsStructuredCLIError(t *testing.T) {
+func TestMCPToolCallReturnsStructuredCLIError(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		t.Skip("shell script fake is unix-only")
 	}
@@ -79,29 +55,7 @@ func TestStreamableHTTPToolCallReturnsStructuredCLIError(t *testing.T) {
 		7,
 	)
 
-	mcpServer := New(Config{Runner: agently.Runner{Binary: fakeCLI}})
-	handler := mcp.NewStreamableHTTPHandler(
-		func(*http.Request) *mcp.Server { return mcpServer },
-		&mcp.StreamableHTTPOptions{JSONResponse: true},
-	)
-	httpServer := httptest.NewServer(handler)
-	t.Cleanup(httpServer.Close)
-
-	client := mcp.NewClient(&mcp.Implementation{Name: "test-client", Version: "0.0.0"}, nil)
-	session, err := client.Connect(
-		context.Background(),
-		&mcp.StreamableClientTransport{Endpoint: httpServer.URL, DisableStandaloneSSE: true},
-		nil,
-	)
-	if err != nil {
-		t.Fatalf("Connect returned error: %v", err)
-	}
-	t.Cleanup(func() {
-		if err := session.Close(); err != nil {
-			t.Fatalf("session.Close returned error: %v", err)
-		}
-	})
-
+	session := newInMemorySession(t, fakeCLI)
 	result, err := session.CallTool(context.Background(), &mcp.CallToolParams{Name: "agently_me"})
 	if err != nil {
 		t.Fatalf("CallTool returned protocol error: %v", err)
@@ -137,6 +91,65 @@ func TestStreamableHTTPToolCallReturnsStructuredCLIError(t *testing.T) {
 	if stdout["ok"] != false {
 		t.Fatalf("stdout ok = %#v, want false", stdout["ok"])
 	}
+}
+
+func TestMCPTrashToolForwardsToAgentlyCLI(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("shell script fake is unix-only")
+	}
+
+	dir := t.TempDir()
+	fakeCLI := filepath.Join(dir, "agently-cli")
+	writeFakeAgentlyCLI(t, fakeCLI, `{"ok":true,"data":{"trashed":true}}`)
+
+	session := newInMemorySession(t, fakeCLI)
+	result, err := session.CallTool(context.Background(), &mcp.CallToolParams{
+		Name:      "agently_message_trash",
+		Arguments: map[string]any{"id": "msg_1"},
+	})
+	if err != nil {
+		t.Fatalf("CallTool returned error: %v", err)
+	}
+	if result.IsError {
+		t.Fatalf("CallTool returned tool error: %#v", result.Content)
+	}
+
+	structured, ok := result.StructuredContent.(map[string]any)
+	if !ok {
+		t.Fatalf("structured content = %#v, want map[string]any", result.StructuredContent)
+	}
+	if structured["ok"] != true {
+		t.Fatalf("ok = %#v, want true", structured["ok"])
+	}
+}
+
+func newInMemorySession(t *testing.T, fakeCLI string) *mcp.ClientSession {
+	t.Helper()
+
+	ctx := context.Background()
+	clientTransport, serverTransport := mcp.NewInMemoryTransports()
+	mcpServer := New(Config{Runner: agently.Runner{Binary: fakeCLI}})
+	serverSession, err := mcpServer.Connect(ctx, serverTransport, nil)
+	if err != nil {
+		t.Fatalf("server Connect returned error: %v", err)
+	}
+	t.Cleanup(func() {
+		if err := serverSession.Close(); err != nil {
+			t.Fatalf("serverSession.Close returned error: %v", err)
+		}
+	})
+
+	client := mcp.NewClient(&mcp.Implementation{Name: "test-client", Version: "0.0.0"}, nil)
+	session, err := client.Connect(ctx, clientTransport, nil)
+	if err != nil {
+		t.Fatalf("client Connect returned error: %v", err)
+	}
+	t.Cleanup(func() {
+		if err := session.Close(); err != nil {
+			t.Fatalf("session.Close returned error: %v", err)
+		}
+	})
+	return session
 }
 
 func writeFakeAgentlyCLI(t *testing.T, path string, stdout string) {
