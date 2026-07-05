@@ -4,6 +4,8 @@
 
 ## Unreleased
 
+## 0.0.6
+
 - 新增 `agently_message_trash`，转发到 `agently-cli message +trash`，用于按 CLI confirmation-token 流程将邮件移入回收站。这是可恢复的移入回收站，不是永久删除；QQ Agent Mail 的回收站邮件会保留 30 天。
 
 ## 0.0.5

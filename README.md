@@ -87,7 +87,7 @@ authorization survives `docker compose down` / `up`.
 To pin a specific image tag, create `.env` next to the compose file:
 
 ```env
-QQ_AGENT_MAIL_MCP_VERSION=v0.0.5
+QQ_AGENT_MAIL_MCP_VERSION=v0.0.6
 ```
 
 Then run the same GHCR compose commands.

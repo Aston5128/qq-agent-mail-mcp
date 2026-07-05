@@ -81,7 +81,7 @@ compose 文件会持久化 `agently-cli` 的 config 和 OAuth keychain 数据，
 如果要固定某个镜像 tag，可以在 compose 文件旁边创建 `.env`：
 
 ```env
-QQ_AGENT_MAIL_MCP_VERSION=v0.0.5
+QQ_AGENT_MAIL_MCP_VERSION=v0.0.6
 ```
 
 然后继续使用上面的 GHCR compose 命令。

@@ -4,6 +4,8 @@
 
 ## Unreleased
 
+## 0.0.6
+
 - Add `agently_message_trash`, forwarding to `agently-cli message +trash` to move messages to trash with the CLI confirmation-token flow. This is recoverable trashing, not permanent deletion; QQ Agent Mail keeps trashed messages for 30 days.
 
 ## 0.0.5
