@@ -20,7 +20,7 @@ email automation platform of its own.
 - No application-specific mail processing logic.
 - No hidden automatic send confirmation.
 - No long-term storage of message bodies or attachments.
-- No delete/trash exposure in the current version.
+- No permanent delete exposure.
 
 ## Structured pass-through
 
@@ -42,9 +42,10 @@ When `agently-cli` exits nonzero and stdout is JSON, the server preserves that
 JSON and returns it as an `isError=true` MCP tool result. CLI-level errors such
 as auth, not found, or invalid arguments should not become MCP protocol errors.
 
-## Send confirmation
+## Action confirmation
 
-`agently-cli message +send`, `+reply`, and `+forward` are two-phase operations:
+`agently-cli message +send`, `+reply`, `+forward`, and `+trash` are two-phase
+operations:
 
 1. first call returns a confirmation payload;
 2. second call includes the confirmation token.
@@ -53,9 +54,9 @@ The MCP server preserves this behavior.
 
 ## Delete / trash
 
-`agently-cli message +trash` exists and uses a confirmation-token flow, but this
-server does not expose it yet. If it is added later, it should have an explicit
-MCP-level confirmation layer in addition to the CLI confirmation flow.
+The server exposes `agently_message_trash` as a typed wrapper around
+`agently-cli message +trash`. This moves a message to trash rather than
+permanently deleting it. QQ Agent Mail keeps trashed messages for 30 days.
 
 ## Runtime model
 

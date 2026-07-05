@@ -2,6 +2,10 @@
 
 > 中文版：[CHANGELOG.zh-CN.md](docs/changelogs/CHANGELOG.zh-CN.md)
 
+## Unreleased
+
+- Add `agently_message_trash`, forwarding to `agently-cli message +trash` to move messages to trash with the CLI confirmation-token flow. This is recoverable trashing, not permanent deletion; QQ Agent Mail keeps trashed messages for 30 days.
+
 ## 0.0.5
 
 - Publish a GitHub Container Registry image: a `publish-ghcr.yml` workflow builds and pushes `ghcr.io/aston5128/qq-agent-mail-mcp` on release, tagged with the release tag and `latest`.

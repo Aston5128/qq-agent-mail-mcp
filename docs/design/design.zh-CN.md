@@ -17,7 +17,7 @@ Server 应该让 Agent 更方便地使用 CLI，而不是自己变成一个邮�
 - 不包含具体应用的邮件处理逻辑。
 - 不隐藏自动发送确认。
 - 不长期存储邮件正文或附件。
-- 当前版本不暴露删除/回收站能力。
+- 不暴露永久删除能力。
 
 ## 结构化透传
 
@@ -36,9 +36,9 @@ Server 应该让 Agent 更方便地使用 CLI，而不是自己变成一个邮�
 
 当 `agently-cli` 非零退出且 stdout 是 JSON 时，server 会保留这份 JSON，并作为 `isError=true` 的 MCP tool result 返回。auth、not found、invalid arguments 这类 CLI 级错误不应该变成 MCP 协议级错误。
 
-## 发送确认
+## 操作确认
 
-`agently-cli message +send`、`+reply`、`+forward` 都是两阶段操作：
+`agently-cli message +send`、`+reply`、`+forward`、`+trash` 都是两阶段操作：
 
 1. 第一次调用返回确认载荷；
 2. 第二次调用带上 confirmation token。
@@ -47,7 +47,7 @@ MCP server 保留这个行为。
 
 ## 删除 / 回收站
 
-`agently-cli message +trash` 已存在，并且也使用 confirmation-token 流程，但当前 server 不暴露它。未来如果增加，应该在 CLI confirmation 之外再加 MCP 层显式确认。
+Server 暴露 `agently_message_trash`，作为 `agently-cli message +trash` 的类型化封装。它会将邮件移入回收站，而不是永久删除。QQ Agent Mail 的回收站邮件会保留 30 天。
 
 ## 运行时模型
 

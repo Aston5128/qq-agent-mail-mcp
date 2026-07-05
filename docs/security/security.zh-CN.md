@@ -20,13 +20,13 @@ server 只暴露具名 tools，不暴露：
 
 - 原始 shell 执行；
 - 任意 CLI 参数执行；
-- 删除/回收站操作。
+- 永久删除操作。
 
-当前版本刻意不转发 `agently-cli message +trash`。
+`agently_message_trash` 会转发 `agently-cli message +trash`，将邮件移入回收站，而不是永久删除。QQ Agent Mail 的回收站邮件会保留 30 天。
 
-## 发送邮件
+## 确认操作
 
-发送、回复、转发都会保留 `agently-cli` 的 confirmation-token 流程。server 不会自动确认外发邮件。
+发送、回复、转发、移入回收站都会保留 `agently-cli` 的 confirmation-token 流程。server 不会自动确认这些操作。
 
 ## Secrets 和日志
 

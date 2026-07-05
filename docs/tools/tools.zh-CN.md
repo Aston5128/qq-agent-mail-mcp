@@ -15,6 +15,7 @@ server 暴露具名 MCP tools，不提供原始 `agently_cli(args)` 执行器。
 | `agently_message_send` | `agently-cli message +send` | 使用 confirmation-token 流程发送邮件。 |
 | `agently_message_reply` | `agently-cli message +reply` | 回复邮件。 |
 | `agently_message_forward` | `agently-cli message +forward` | 转发邮件。 |
+| `agently_message_trash` | `agently-cli message +trash` | 将邮件移入回收站。 |
 | `agently_attachment_upload` | `agently-cli attachment +upload` | 上传本地文件作为附件。 |
 | `agently_attachment_download` | `agently-cli attachment +download` | 下载附件。 |
 
@@ -82,6 +83,15 @@ server 暴露具名 MCP tools，不提供原始 `agently_cli(args)` 执行器。
 - `confirmation_token`
 - `include_attachments`
 
+## 回收站
+
+`agently_message_trash` 支持：
+
+- `id`
+- `confirmation_token`
+
+它会将邮件移入回收站，而不是永久删除。QQ Agent Mail 的回收站邮件会保留 30 天。
+
 ## 附件
 
 `agently_attachment_upload` 需要：
@@ -97,15 +107,11 @@ server 暴露具名 MCP tools，不提供原始 `agently_cli(args)` 执行器。
 
 - `output`
 
-## 发送确认
+## 确认流程
 
-`agently-cli message +send`、`+reply`、`+forward` 使用 confirmation-token 流程：
+`agently-cli message +send`、`+reply`、`+forward`、`+trash` 使用 confirmation-token 流程：
 
 1. 第一次调用返回确认载荷。
 2. 第二次调用带上 `confirmation_token` 完成操作。
 
-MCP server 保留这个行为，不会自动确认发送。
-
-## 未暴露
-
-当前版本刻意不暴露 `agently-cli message +trash`，即使 CLI 本身支持。未来如果增加删除/回收站能力，也应该在 CLI confirmation 之外再加 MCP 层二次确认。
+MCP server 保留这个行为，不会自动确认这些操作。

@@ -16,6 +16,7 @@ The server exposes named MCP tools. It does not expose a raw
 | `agently_message_send` | `agently-cli message +send` | Send a message with confirmation-token flow. |
 | `agently_message_reply` | `agently-cli message +reply` | Reply to a message. |
 | `agently_message_forward` | `agently-cli message +forward` | Forward a message. |
+| `agently_message_trash` | `agently-cli message +trash` | Move a message to trash. |
 | `agently_attachment_upload` | `agently-cli attachment +upload` | Upload a local file for use as an attachment. |
 | `agently_attachment_download` | `agently-cli attachment +download` | Download an attachment. |
 
@@ -83,6 +84,16 @@ The server exposes named MCP tools. It does not expose a raw
 - `confirmation_token`
 - `include_attachments`
 
+## Trash
+
+`agently_message_trash` supports:
+
+- `id`
+- `confirmation_token`
+
+It moves a message to trash rather than permanently deleting it. QQ Agent Mail
+keeps trashed messages for 30 days.
+
 ## Attachments
 
 `agently_attachment_upload` requires:
@@ -98,19 +109,12 @@ Optional:
 
 - `output`
 
-## Send confirmation
+## Confirmation
 
-`agently-cli message +send`, `+reply`, and `+forward` use a confirmation-token
-flow:
+`agently-cli message +send`, `+reply`, `+forward`, and `+trash` use a
+confirmation-token flow:
 
 1. First call returns a confirmation payload.
 2. Second call includes `confirmation_token` to complete the action.
 
-The MCP server preserves this behavior and does not auto-confirm messages.
-
-## Not exposed
-
-`agently-cli message +trash` is intentionally not exposed in the current version,
-even though the CLI supports it. If delete/trash is added later, it should have
-an explicit MCP-level confirmation layer in addition to the CLI confirmation
-flow.
+The MCP server preserves this behavior and does not auto-confirm these actions.

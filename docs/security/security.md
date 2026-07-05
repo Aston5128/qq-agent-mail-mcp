@@ -22,15 +22,16 @@ The server exposes named tools only. It does not expose:
 
 - raw shell execution;
 - arbitrary CLI argument execution;
-- delete/trash operations.
+- permanent delete operations.
 
-`agently-cli message +trash` is intentionally not forwarded in the current
-version.
+`agently_message_trash` forwards `agently-cli message +trash`, which moves a
+message to trash rather than permanently deleting it. QQ Agent Mail keeps
+trashed messages for 30 days.
 
-## Sending mail
+## Confirmed actions
 
-Send, reply, and forward preserve the `agently-cli` confirmation-token flow. The
-server does not auto-confirm outbound messages.
+Send, reply, forward, and trash preserve the `agently-cli` confirmation-token
+flow. The server does not auto-confirm these actions.
 
 ## Secrets and logs
 

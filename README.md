@@ -23,7 +23,6 @@ Current limitations:
 - MCP bearer-token authentication is not implemented yet.
 - stdio transport is not implemented yet.
 - `agently-cli` OAuth management commands are not exposed by this server.
-- Delete/trash operations are intentionally not exposed.
 
 ## Why this exists
 
@@ -128,6 +127,7 @@ network, or protect it with a reverse proxy / firewall.
 | `agently_message_send` | `agently-cli message +send` |
 | `agently_message_reply` | `agently-cli message +reply` |
 | `agently_message_forward` | `agently-cli message +forward` |
+| `agently_message_trash` | `agently-cli message +trash` |
 | `agently_attachment_upload` | `agently-cli attachment +upload` |
 | `agently_attachment_download` | `agently-cli attachment +download` |
 

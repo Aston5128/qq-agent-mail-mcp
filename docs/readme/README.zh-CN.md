@@ -22,7 +22,6 @@ QQ Agent Mail MCP 是一个轻量级 StreamableHTTP MCP Server，通过 [QQ Agen
 - 尚未实现 MCP bearer-token 认证。
 - 尚未实现 stdio transport。
 - 尚未由本 server 暴露 `agently-cli` OAuth 管理命令。
-- 刻意不暴露删除/回收站操作。
 
 ## 为什么需要这个项目
 
@@ -116,6 +115,7 @@ make compose-build
 | `agently_message_send` | `agently-cli message +send` |
 | `agently_message_reply` | `agently-cli message +reply` |
 | `agently_message_forward` | `agently-cli message +forward` |
+| `agently_message_trash` | `agently-cli message +trash` |
 | `agently_attachment_upload` | `agently-cli attachment +upload` |
 | `agently_attachment_download` | `agently-cli attachment +download` |
 
