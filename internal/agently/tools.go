@@ -134,6 +134,17 @@ func (in MessageForwardInput) Args() []string {
 	return args
 }
 
+type MessageTrashInput struct {
+	ID                string `json:"id" jsonschema:"message_id to move to trash"`
+	ConfirmationToken string `json:"confirmation_token,omitempty" jsonschema:"token returned by first trash call"`
+}
+
+func (in MessageTrashInput) Args() []string {
+	args := []string{"message", "+trash", "--id", in.ID}
+	addString(&args, "--confirmation-token", in.ConfirmationToken)
+	return args
+}
+
 type AttachmentUploadInput struct {
 	File string `json:"file" jsonschema:"relative local file path to upload"`
 }

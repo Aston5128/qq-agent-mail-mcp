@@ -33,6 +33,22 @@ func TestMessageSendArgs(t *testing.T) {
 	}
 }
 
+func TestMessageTrashArgs(t *testing.T) {
+	got := MessageTrashInput{ID: "msg_1"}.Args()
+	want := []string{"message", "+trash", "--id", "msg_1"}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("args = %#v, want %#v", got, want)
+	}
+}
+
+func TestMessageTrashArgsWithConfirmationToken(t *testing.T) {
+	got := MessageTrashInput{ID: "msg_1", ConfirmationToken: "tok_123"}.Args()
+	want := []string{"message", "+trash", "--id", "msg_1", "--confirmation-token", "tok_123"}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("args = %#v, want %#v", got, want)
+	}
+}
+
 func TestAttachmentDownloadArgs(t *testing.T) {
 	got := AttachmentDownloadInput{
 		MessageID:    "msg_1",
